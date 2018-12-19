@@ -1,0 +1,14 @@
+{
+  "apps": [{
+    "name": "xj-node",
+    "script": "index.js",
+    "node_args": "--harmony",
+    "watch": [
+      "dist"
+    ],
+    "cron_restart" : "0 */4 * * *",
+    "log_date_format": "YYYY-MM-DD HH:mm:ss Z",
+    "instances": 1,
+    "exec_mode": "fork_mode"
+  }]
+}
