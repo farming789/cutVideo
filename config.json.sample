@@ -7,113 +7,150 @@
     "database": "feimu"
   },
   "acrcloud": {
+    "dataType":"fingerprint",
     "console": {
       "host": "cn-api.acrcloud.com",
       "signature_version": "1",
       "secure": true,
-      "access_key": "6b5f220e0a5a0349",
-      "access_secret": "487700972d6273fd966ad62d614d68e5",
-      "bucket_name": "feimu"
+      "access_key": "15b2bcdf119b12e1",
+      "access_secret": "992b6a1b26e569f367bd604095654812"
+    },
+    "fingerprint" : {
+      "cmd":"/home/ubuntu/bin/acrcloud_extr_linux"
     }
   },
   "ffmpeg": {
+   "ffmpegPath" : "/home/ubuntu/bin/ffmpeg",
+   "ffprobePath": "/home/ubuntu/bin/ffprobe",
     "basePath": {
       "origin": "/Users/njwangchuan/media/origin/",
       "novideo": "/Users/njwangchuan/media/novideo/",
       "resize": "/Users/njwangchuan/media/resize/",
       "cut": "/Users/njwangchuan/media/cut/"
+      "fingerprint": "/Users/njwangchuan/daily/media-fingerprint/",
     },
     "resize": {
-      "1080p": {
-        "width": 1920,
-        "height": 1080,
-        "audioBitrate": 128,
-        "videoBitrate": 2500
-      },
-      "720p": {
-        "width": 1280,
-        "height": 720,
-        "audioBitrate": 128,
-        "videoBitrate": 1800
-      },
-      "480p": {
-        "width": 640,
-        "height": 480,
-        "audioBitrate": 96,
-        "videoBitrate": 900
-      },
-      "360p": {
-        "width": 640,
-        "height": 360,
-        "audioBitrate": 64,
-        "videoBitrate": 500
-      }
-    },
-    "cut": {
-      "interval": 15,
-      "duration": 60
-    }
+         "forceResize":false,
+         "1080p": {
+           "width": 1920,
+           "height": 1080,
+           "audioBitrate": 160,
+           "videoBitrate": 5400
+         },
+         "720p": {
+           "width": 1280,
+           "height": 720,
+           "audioBitrate": 160,
+           "videoBitrate": 2400
+         },
+         "480p-16x9": {
+           "width": 854,
+           "height": 480,
+           "audioBitrate": 128,
+           "videoBitrate": 1200
+         },
+         "480p-4x3": {
+           "width": 640,
+           "height": 480,
+           "audioBitrate": 128,
+           "videoBitrate": 900
+         },
+         "360p-16x9": {
+           "width": 640,
+           "height": 360,
+           "audioBitrate": 128,
+           "videoBitrate": 720
+         },
+         "360p-4x3": {
+           "width": 480,
+           "height": 360,
+           "audioBitrate": 128,
+           "videoBitrate": 600
+         },
+         "320x240": {
+           "width": 320,
+           "height": 240,
+           "audioBitrate": 64,
+           "videoBitrate": 300
+         }
+       },
+       "cut": {
+         "interval": 15,
+         "duration": 60
+       },
+       "thumbnail": {
+         "duration": 2,
+         "fps" : 16,
+         "resize": {
+           "width": 320,
+           "height": 240
+         }
+       }
   },
   "qiniu": {
     "ak": "oSIae2sZ5gLi2MVW6VOsLPr3GoW8RFZiopYNXYon",
     "sk": "a5mqSXohWcu49gaflxq7w6gqP40jIdhYQ-Yd27qG",
+    "zone" : "Zone_z0",
+    "bucket": "tvsonar-cut",
+    "file_name_hash":true,
+    "feimu": {
+      "zone": "Zone_z0",
+      "bucket" : {
+        "cut" : "feimu-cut",
+        "jpg" : "feimu-cut",
+        "gif" : "feimu-cut"
+        }
+      },
+    "ak": "oSIae2sZ5gLi2MVW6VOsLPr3GoW8RFZiopYNXYon",
+    "sk": "a5mqSXohWcu49gaflxq7w6gqP40jIdhYQ-Yd27qG",
     "zone": "Zone_z0",
     "bucket": "tvsonar-cut",
-    "file_name_hash": true,
-    "fops": {
-      "srcBucket": "tvsonar",
-      "saveBucket": "tvsonar-m3u8",
-      "pipeline": "tvsonar",
-      "srcKey": "s2-cut-360p.mp4",
-      "duration": "00:01:13.00",
-      "interval": 15,
-      "options": {
-        "notifyURL": "http://api.example.com/pfop/callback",
-        "force": false
-      }
-    },
-    "transcode": {
-      "srcBucket": "tvsonar-debug",
-      "saveBucket": "tvsonar-debug",
-      "pipeline": "tvsonar",
-      "options": {
-        "notifyURL": "http://api.example.com/pfop/callback",
-        "force": false
-      }
-    }
+    "file_name_hash": true
   },
-  "schedule": {
-    "instance_id": 0,
-    "noVideo": {
-      "enabled" : true,
-      "cron": "*/1 * * * *",
-      "querylimit": 5,
-      "maplimit": 5
-    },
-    "uploadACRCloud": {
-      "enabled" : true,
-      "cron": "*/5 * * * *",
-      "querylimit": 5,
-      "maplimit": 5
-    },
-    "resize": {
-      "enabled" : true,
-      "cron": "*/2 * * * *",
-      "querylimit": 5,
-      "maplimit": 2
-    },
-    "cut": {
-      "enabled" : true,
-      "cron": "*/3 * * * *",
-      "querylimit": 1,
-      "maplimit": 1,
-      "cutlimit": 5
-    },
-    "uploadQiniu": {
-      "enabled" : false,
-      "cron": "*/5 * * * *",
-      "querylimit": 5,
-      "maplimit": 5
-    }
-  }
+ "schedule": {
+     "instance_id": 0,
+     "noVideo": {
+       "enabled" : true,
+       "cron": "*/1 * * * *",
+       "querylimit": 5,
+       "maplimit": 5
+     },
+     "uploadACRCloud" : {
+       "enabled" : false,
+       "cron": "*/5 * * * *",
+       "querylimit": 5,
+       "maplimit": 5
+     },
+     "resize": {
+       "enabled" : true,
+       "cron": "*/2 * * * *",
+       "querylimit": 5,
+       "maplimit": 2
+     },
+     "cut": {
+       "enabled" : true,
+       "cron": "*/1 * * * *",
+       "querylimit": 1,
+       "maplimit": 1,
+       "cutlimit": 5
+     },
+     "uploadQiniu": {
+       "enabled" :false,
+       "cron": "*/1 * * * *",
+       "querylimit": 10,
+       "maplimit": 5
+     },
+     "feimuCut": {
+       "enabled": false,
+       "cron": "*/2 * * * *",
+       "querylimit": 10,
+       "maplimit": 5
+     },
+     "uploadFeimuCut": {
+       "enabled": false,
+       "cron": "*/1 * * * *",
+       "querylimit": 5,
+       "maplimit": 5
+     }
+   }
 }

@@ -24,12 +24,14 @@ npm i pm2 -g
 sudo apt-get install mysql-server
 ```
 
+下载arcCloud指纹提取工具
+https://www.acrcloud.com/docs/acrcloud/fingerprinting-tools/audio-file-fingerprinting-tool/
+
 七牛云视频切片程序
 
 ## 安装
 
 ```bash
-$ npm i pm2 -g
 $ npm install
 ```
 
