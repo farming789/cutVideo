@@ -1,5 +1,29 @@
 # xj-node
 
+
+安装nvm
+```bash
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+```
+
+使用nvm安装node
+```bash
+nvm install node
+```
+
+安装pm2
+```bash
+npm i pm2 -g
+```
+
+安装ffmpeg
+参见ffmpeg编译安装.md
+
+安装mysql5.7
+```bash
+sudo apt-get install mysql-server
+```
+
 七牛云视频切片程序
 
 ## 安装
