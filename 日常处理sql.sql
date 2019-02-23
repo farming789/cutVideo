@@ -60,3 +60,9 @@ AND mr.file_title IN(
 				) AS left_upload FROM mv_cut mc GROUP BY mc.file_origin_title HAVING left_upload = 0
 		) aa
 )
+
+#删除
+delete from mv_cut where file_origin_title='菲利普船长';
+delete from mv_novideos where file_title='菲利普船长';
+delete from mv_resize where file_title='菲利普船长';
+delete from mv_origin where file_title='菲利普船长';
