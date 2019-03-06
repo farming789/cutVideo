@@ -51,9 +51,11 @@ var upload = (row, callback) => {
   });
 };
 
+//抽取音频
 module.exports.novideo = (row, callback) => {
+    var startTime=new Date();//记录开始抽取时间
   async.waterfall([
-    //先获取基本信息
+    //通过ffmpeg先获取基本信息
     (callback) => {
       ffmpeg.info(ffmpegConfig.basePath.origin.replace('${acr_bucket_name}',row.acr_bucket_name) + row.file_path, callback);
     },
@@ -65,24 +67,27 @@ module.exports.novideo = (row, callback) => {
         "noVideo": true,
         "audioCodec": 'copy'
       };
+      //使用ffmpeg抽取m4a音频文件，音频文件存储在ffmpegConfig.basePath.novideo文件夹下
       ffmpeg.execution(ffmpegConfig.basePath.origin.replace('${acr_bucket_name}',row.acr_bucket_name) + row.file_path, ffmpegConfig.basePath.novideo + fileName + '.m4a', options, (err, result) => {
         if (err) {
-          //callback(err, null);
+          //抽取失败，更新mv_origin
           row.novideo_status = -1;
           db.updateTable('mv_origin', 'id', [row], callback);
         } else {
-          //保存信息到数据库
           var options = {
             fileName: fileName,
             inputFile: ffmpegConfig.basePath.novideo + fileName + '.m4a',
             outputFile: ffmpegConfig.basePath.fingerprint + fileName + '.acr'
           }
+          //通过acrCloud生成指纹文件,指纹文件存储在ffmpegConfig.basePath.fingerprint文件夹下
           acrcloud.createFingerprint(options, (err, stdout, stderr) => {
             if (err) {
+              //指纹生成失败，更新mv_origin
               console.log('acrcloud fingerprint error:', err);
               row.novideo_status = -2;
               db.updateTable('mv_origin', 'id', [row], callback);
             } else {
+              //指纹生成成功，插入mv_novideos,并更新mv_origin
               var item = {
                 instance_id: scheduleOptions.instance_id,
                 file_path: ffmpegConfig.basePath.novideo + fileName + '.m4a',
@@ -91,7 +96,9 @@ module.exports.novideo = (row, callback) => {
                 file_title: row.file_title,
                 acr_bucket_name: row.acr_bucket_name,
                 upload_status: 0,
-                created_at: new Date()
+                created_at: new Date(),
+                 start_time:startTime,
+                 end_time:new Date()
               };
               db.insertIgnoreTable('mv_novideos', [item], (err, result) => {
                 if (err) {
@@ -112,11 +119,11 @@ module.exports.novideo = (row, callback) => {
     if (err) {
       if (err.message.indexOf('No such file or directory') != -1) {
         //源文件缺失
-        row.novideo_status = -2;
+        row.novideo_status = -3;
         db.updateTable('mv_origin', 'id', [row], callback);
       } else if (err.message.indexOf('Invalid data found when processing input') != -1) {
         //源文件缺失
-        row.novideo_status = -1;
+        row.novideo_status = -4;
         db.updateTable('mv_origin', 'id', [row], callback);
       } else {
         callback(err, null);
@@ -127,6 +134,7 @@ module.exports.novideo = (row, callback) => {
   });
 };
 
+//生成指纹文件，如果发现没有指纹文件，则重新生成指纹文件
 module.exports.uploadACRCloud = (row, callback) => {
   if (acrcloudConfig.dataType == 'fingerprint' && !row.file_fingerprint) {
     //重新生成指纹文件
@@ -202,8 +210,9 @@ module.exports.deleteACRCloud = (row, callback) => {
 
 module.exports.resize = (row, callback) => {
   //console.log ('row = ' ,row);
+    var resizeStartTime=new Date();//开始转码时间
   async.waterfall([
-    //先获取基本信息
+    //通过ffmpeg 先获取基本信息
     (callback) => {
       ffmpeg.info(ffmpegConfig.basePath.origin.replace('${acr_bucket_name}',row.acr_bucket_name)  + row.file_path, callback);
     },
@@ -217,6 +226,7 @@ module.exports.resize = (row, callback) => {
         var audioStream = metadata.streams[1];
         var width = vidoeStream.width;
         var height = vidoeStream.height;
+        //获取根据设定的分辨率读取配置文件信息
         var resize = ffmpegConfig.resize[row.resize];
         //源文件码率大于目标码率，则降码处理
         var options = {
@@ -253,7 +263,9 @@ module.exports.resize = (row, callback) => {
               file_title: row.file_title,
               cut_status: 0,
               upload_status: 0,
-              created_at: new Date()
+              created_at: new Date(),
+              resize_start_time:resizeStartTime,
+              resize_end_time:new Date()
             };
             db.insertIgnoreTable('mv_resize', [item], (err, result) => {
               if (err) {
@@ -271,13 +283,14 @@ module.exports.resize = (row, callback) => {
             return;
           }
         }
+        //options：audioBitrate  videoBitrate  size
         ffmpeg.execution(ffmpegConfig.basePath.origin.replace('${acr_bucket_name}',row.acr_bucket_name)  + row.file_path, ffmpegConfig.basePath.resize + fileName + '-' + options.size + '.mp4', options, (err, result) => {
           if (err) {
             //callback(err, null);
             row.resize_status = -1;
             db.updateTable('mv_origin', 'id', [row], callback);
           } else {
-            //保存信息到数据库
+            //插入mv_resize表，并更新mv_origin的
             var item = {
               instance_id: scheduleOptions.instance_id,
               file_path: ffmpegConfig.basePath.resize + fileName + '-' + options.size + '.mp4',
@@ -285,7 +298,9 @@ module.exports.resize = (row, callback) => {
               file_title: row.file_title,
               cut_status: 0,
               upload_status: 0,
-              created_at: new Date()
+              created_at: new Date(),
+              resize_start_time:resizeStartTime,
+              resize_end_time:new Date()
             };
             db.insertIgnoreTable('mv_resize', [item], (err, result) => {
               if (err) {
@@ -324,6 +339,7 @@ module.exports.resize = (row, callback) => {
 };
 
 module.exports.cut = (row, callback) => {
+    var cutStartTime=new Date();
   async.waterfall([
     //先获取基本信息
     (callback) => {
@@ -360,9 +376,10 @@ module.exports.cut = (row, callback) => {
         }
         //console.log(item);
         db.query('select file_name from mv_cut where file_origin_name = ? ', [row.file_name], (err, rows, fields) => {
-          //去重过滤
+          //去重过滤，已经切出来的片段，不再进行切片
           var fileNames = rows.map(row => row.file_name);
           opts = opts.filter(item => fileNames.indexOf(item.file_name) == -1);
+          //开始批量切片
           async.mapLimit(opts, scheduleOptions.cut.cutlimit, cut, (err, results) => {
             //全部切割完毕后更新resize文件状态
             if (err) {
@@ -370,6 +387,8 @@ module.exports.cut = (row, callback) => {
             } else {
               row.cut_status = true;
               row.updated_at = new Date();
+              row.cut_end_time=new Date();
+              row.cut_start_time=cutStartTime;
               db.updateTable('mv_resize', 'id', [row], callback);
             }
           });
