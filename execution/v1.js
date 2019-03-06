@@ -417,6 +417,7 @@ module.exports.cut = (row, callback) => {
 };
 
 module.exports.uploadQiniu = (row, callback) => {
+    var uploadStartTime=new Date();
   qiniu.uploadFile(row.file_name, row.file_path, null, (err, body, info) => {
     if (err) {
       callback(err, null);
@@ -428,6 +429,8 @@ module.exports.uploadQiniu = (row, callback) => {
         row.qiniu_key = body.key;
         row.upload_status = 1;
         row.updated_at = new Date();
+        row.upload_start_time=uploadStartTime;
+        row.upload_end_time=new Date();
         db.updateTable('mv_cut', 'id', [row], callback);
       } else {
         callback(null, 'qiniu upload error:' + body);
