@@ -97,8 +97,8 @@ module.exports.novideo = (row, callback) => {
                 acr_bucket_name: row.acr_bucket_name,
                 upload_status: 0,
                 created_at: new Date(),
-                 start_time:startTime,
-                 end_time:new Date()
+                  novideo_start_time:startTime,
+                  novideo_end_time:new Date()
               };
               db.insertIgnoreTable('mv_novideos', [item], (err, result) => {
                 if (err) {
