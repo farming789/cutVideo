@@ -1,3 +1,26 @@
+##查询某个片源的音频提取，转码，切片，切片上传时间
+select a.file_title,a.novideo_status,a.resize_status,
+b.novideo_start_time,b.novideo_end_time,
+c.resize_start_time,c.resize_end_time,
+c.cut_status,c.cut_start_time,c.cut_end_time,
+(
+	select MIN(upload_status) from mv_cut where file_origin_title=a.file_title
+	group by file_origin_title
+) upload_status,
+(
+	select MIN(upload_start_time) from mv_cut where file_origin_title=a.file_title
+	group by file_origin_title
+) upload_start_time,
+(
+	select MAX(upload_end_time) from mv_cut where file_origin_title=a.file_title
+	group by file_origin_title
+) upload_end_time
+from mv_origin a
+left join mv_novideos b on a.file_title=b.file_title
+left join mv_resize c on a.file_title=c.file_title
+where a.file_title='s2-2'
+
+
 ## 备份并清空mv_tmp表
 
 CREATE TABLE mv_tmp_20180731 SELECT
