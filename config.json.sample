@@ -1,10 +1,15 @@
 {
-  "db": {
-    "connectionLimit": 10,
-    "host": "localhost",
-    "user": "root",
-    "password": "",
-    "database": "feimu"
+ "db": {
+      "connectionLimit": 20,
+      "host": "feimumaster.mysql.rds.aliyuncs.com",
+      "user": "root",
+      "password": "feimu!@#0",
+      "database": "feimu-cut-test"
+    },
+  "ssh":{
+      "host":"47.100.255.139",
+      "user":"feimu139",
+      "privateKeyPath":"/Users/yuhuaming/.ssh/id_rsa"
   },
   "acrcloud": {
     "dataType":"fingerprint",
