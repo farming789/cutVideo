@@ -33,7 +33,7 @@ function sign(signString, accessSecret) {
  */
 function identify(data, options, cb) {
 
-  var current_data = new Date();
+  var current_data = new Date().zoneDate();
   var timestamp = current_data.getTime() / 1000;
   var stringToSign = buildStringToSign('POST', options.endpoint, options.access_key, options.data_type, options.signature_version, timestamp);
   var signature = sign(stringToSign, options.access_secret);

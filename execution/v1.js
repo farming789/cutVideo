@@ -16,7 +16,7 @@ var cut = (item, callback) => {
     } else {
       //保存信息到数据库
       item.upload_status = 0;
-      item.created_at = new Date();
+      item.created_at = new Date().zoneDate();
       item.cut_options = JSON.stringify(item.cut_options);
       db.replaceTable('mv_cut', [item], callback);
     }
@@ -45,7 +45,7 @@ var upload = (row, callback) => {
       row.acr_audio_id = body.audio_id;
       row.upload_type = acrcloudConfig.dataType;
       row.upload_status = true;
-      row.updated_at = new Date();
+      row.updated_at = new Date().zoneDate();
       db.updateTable('mv_novideos', 'id', [row], callback);
     }
   });
@@ -53,7 +53,7 @@ var upload = (row, callback) => {
 
 //抽取音频
 module.exports.novideo = (row, callback) => {
-    var startTime=new Date();//记录开始抽取时间
+    var startTime=new Date().zoneDate();//记录开始抽取时间
   async.waterfall([
     //通过ffmpeg先获取基本信息
     (callback) => {
@@ -96,9 +96,9 @@ module.exports.novideo = (row, callback) => {
                 file_title: row.file_title,
                 acr_bucket_name: row.acr_bucket_name,
                 upload_status: 0,
-                created_at: new Date(),
+                created_at: new Date().zoneDate(),
                   novideo_start_time:startTime,
-                  novideo_end_time:new Date()
+                  novideo_end_time:new Date().zoneDate()
               };
               db.insertIgnoreTable('mv_novideos', [item], (err, result) => {
                 if (err) {
@@ -106,7 +106,7 @@ module.exports.novideo = (row, callback) => {
                 } else {
                   row.metadata = JSON.stringify(metadata);
                   row.novideo_status = true;
-                  row.updated_at = new Date();
+                  row.updated_at = new Date().zoneDate();
                   db.updateTable('mv_origin', 'id', [row], callback);
                 }
               });
@@ -176,7 +176,7 @@ module.exports.asyncACRCloud = (row, callback) => {
       row.acr_bucket_id = body.bucket_id;
       row.acr_duration = body.duration;
       row.acr_state = body.state;
-      row.updated_at = new Date();
+      row.updated_at = new Date().zoneDate();
       db.updateTable('mv_novideos', 'id', [row], callback);
     }
   });
@@ -202,7 +202,7 @@ module.exports.deleteACRCloud = (row, callback) => {
       }
     } else {
       row.del_status = 2;
-      row.updated_at = new Date();
+      row.updated_at = new Date().zoneDate();
       db.updateTable('mv_novideos', 'id', [row], callback);
     }
   });
@@ -210,7 +210,7 @@ module.exports.deleteACRCloud = (row, callback) => {
 
 module.exports.resize = (row, callback) => {
   //console.log ('row = ' ,row);
-    var resizeStartTime=new Date();//开始转码时间
+    var resizeStartTime=new Date().zoneDate();//开始转码时间
   async.waterfall([
     //通过ffmpeg 先获取基本信息
     (callback) => {
@@ -263,9 +263,9 @@ module.exports.resize = (row, callback) => {
               file_title: row.file_title,
               cut_status: 0,
               upload_status: 0,
-              created_at: new Date(),
+              created_at: new Date().zoneDate(),
               resize_start_time:resizeStartTime,
-              resize_end_time:new Date()
+              resize_end_time:new Date().zoneDate()
             };
             db.insertIgnoreTable('mv_resize', [item], (err, result) => {
               if (err) {
@@ -276,7 +276,7 @@ module.exports.resize = (row, callback) => {
                 row.start_time = metadata.format.start_time;
                 row.bit_rate = metadata.format.bit_rate;
                 row.resize_status = true;
-                row.updated_at = new Date();
+                row.updated_at = new Date().zoneDate();
                 db.updateTable('mv_origin', 'id', [row], callback);
               }
             });
@@ -298,9 +298,9 @@ module.exports.resize = (row, callback) => {
               file_title: row.file_title,
               cut_status: 0,
               upload_status: 0,
-              created_at: new Date(),
+              created_at: new Date().zoneDate(),
               resize_start_time:resizeStartTime,
-              resize_end_time:new Date()
+              resize_end_time:new Date().zoneDate()
             };
             db.insertIgnoreTable('mv_resize', [item], (err, result) => {
               if (err) {
@@ -311,7 +311,7 @@ module.exports.resize = (row, callback) => {
                 row.start_time = metadata.format.start_time;
                 row.bit_rate = metadata.format.bit_rate;
                 row.resize_status = true;
-                row.updated_at = new Date();
+                row.updated_at = new Date().zoneDate();
                 db.updateTable('mv_origin', 'id', [row], callback);
               }
             });
@@ -339,7 +339,7 @@ module.exports.resize = (row, callback) => {
 };
 
 module.exports.cut = (row, callback) => {
-    var cutStartTime=new Date();
+    var cutStartTime=new Date().zoneDate();
   async.waterfall([
     //先获取基本信息
     (callback) => {
@@ -386,8 +386,8 @@ module.exports.cut = (row, callback) => {
               callback(err, null);
             } else {
               row.cut_status = true;
-              row.updated_at = new Date();
-              row.cut_end_time=new Date();
+              row.updated_at = new Date().zoneDate();
+              row.cut_end_time=new Date().zoneDate();
               row.cut_start_time=cutStartTime;
               db.updateTable('mv_resize', 'id', [row], callback);
             }
@@ -417,7 +417,7 @@ module.exports.cut = (row, callback) => {
 };
 
 module.exports.uploadQiniu = (row, callback) => {
-    var uploadStartTime=new Date();
+    var uploadStartTime=new Date().zoneDate();
   qiniu.uploadFile(row.file_name, row.file_path, null, (err, body, info) => {
     if (err) {
       callback(err, null);
@@ -428,9 +428,9 @@ module.exports.uploadQiniu = (row, callback) => {
         row.qiniu_hash = body.hash;
         row.qiniu_key = body.key;
         row.upload_status = 1;
-        row.updated_at = new Date();
+        row.updated_at = new Date().zoneDate();
         row.upload_start_time=uploadStartTime;
-        row.upload_end_time=new Date();
+        row.upload_end_time=new Date().zoneDate();
         db.updateTable('mv_cut', 'id', [row], callback);
       } else {
         callback(null, 'qiniu upload error:' + body);
@@ -473,7 +473,7 @@ module.exports.feimuCut = (row, callback) => {
             file_path: row.file_path,
             qiniu_zone: qiniuConfig.feimu.zone,
             qiniu_bucket: qiniuConfig.feimu.bucket.cut,
-            created_at: new Date()
+            created_at: new Date().zoneDate()
           }
           uploadItems.push(item);
           ffmpeg.info(row.file_path, callback);
@@ -497,7 +497,7 @@ module.exports.feimuCut = (row, callback) => {
             file_path: row.jpg_path,
             qiniu_zone: qiniuConfig.feimu.zone,
             qiniu_bucket: qiniuConfig.feimu.bucket.jpg,
-            created_at: new Date()
+            created_at: new Date().zoneDate()
           }
           uploadItems.push(item);
           callback(null, metadata);
@@ -538,7 +538,7 @@ module.exports.feimuCut = (row, callback) => {
             file_path: row.gif_path,
             qiniu_zone: qiniuConfig.feimu.zone,
             qiniu_bucket: qiniuConfig.feimu.bucket.jpg,
-            created_at: new Date()
+            created_at: new Date().zoneDate()
           }
           uploadItems.push(item);
           db.insertIgnoreTable('mv_feimu_upload', uploadItems, (err, results) => {
@@ -547,7 +547,7 @@ module.exports.feimuCut = (row, callback) => {
               db.updateTable('mv_feimu', 'id', [row], callback);
             } else {
               row.cut_status = 1;
-              row.updated_at = new Date();
+              row.updated_at = new Date().zoneDate();
               db.updateTable('mv_feimu', 'id', [row], callback);
             }
           });
@@ -583,7 +583,7 @@ module.exports.uploadFiemuCut = (row, callback) => {
         row.qiniu_bucket = row.qiniu_bucket;
         row.qiniu_hash = body.hash;
         row.qiniu_key = body.key;
-        row.updated_at = new Date();
+        row.updated_at = new Date().zoneDate();
         db.updateTable('mv_feimu_upload', 'id', [row], callback);
       } else {
         callback(null, 'qiniu upload error:' + body);

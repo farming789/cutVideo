@@ -19,7 +19,7 @@ var move = (row, callback) => {
       console.log(err);
     } else {
       row.qiniu_bucket = 'suona-cut-resouce';
-      row.updated_at = new Date();
+      row.updated_at = new Date().zoneDate();
       db.updateTable('mv_cut', 'id', [row], callback);
     }
   });
