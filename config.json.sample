@@ -4,7 +4,8 @@
       "host": "feimumaster.mysql.rds.aliyuncs.com",
       "user": "root",
       "password": "feimu!@#0",
-      "database": "feimu-cut-test"
+      "database": "feimu-cut-test",
+      "timezone": "08:00"
     },
   "ssh":{
       "host":"47.100.255.139",
