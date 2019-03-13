@@ -220,10 +220,12 @@ module.exports.resize = (row, callback) => {
     (metadata, callback) => {
       var fileName = row.file_path.split('.')[0];
       var extention = row.file_path.split('.')[1];
-      if (metadata.streams.length >= 2 && metadata.streams[0].codec_type == 'video') {
+
+      var vidoeStream = ffmpeg.getVideoStream(metadata.streams);
+      var audioStream = ffmpeg.getAudioStream(metadata.streams);
+
+      if (vidoeStream&&vidoeStream) {
         console.log('开始转码');
-        var vidoeStream = metadata.streams[0];
-        var audioStream = metadata.streams[1];
         var width = vidoeStream.width;
         var height = vidoeStream.height;
         //获取根据设定的分辨率读取配置文件信息
@@ -287,7 +289,7 @@ module.exports.resize = (row, callback) => {
         ffmpeg.execution(ffmpegConfig.basePath.origin.replace('${acr_bucket_name}',row.acr_bucket_name)  + row.file_path, ffmpegConfig.basePath.resize + fileName + '-' + options.size + '.mp4', options, (err, result) => {
           if (err) {
             //callback(err, null);
-            row.resize_status = -1;
+            row.resize_status = -2;
             db.updateTable('mv_origin', 'id', [row], callback);
           } else {
             //插入mv_resize表，并更新mv_origin的
@@ -319,7 +321,7 @@ module.exports.resize = (row, callback) => {
         });
       } else {
         //非视频文件
-        console.log('streams length = ', metadata.streams.length, 'codec_type = ', metadata.streams[0].codec_type)
+        console.log('streams length = ', metadata.streams.length)
         console.log('非视频文件, row = ', row);
         row.resize_status = -1;
         db.updateTable('mv_origin', 'id', [row], callback);
@@ -510,7 +512,7 @@ module.exports.feimuCut = (row, callback) => {
         "fps": ffmpegConfig.thumbnail.fps,
         "duration": ffmpegConfig.thumbnail.duration
       };
-      var vidoeStream = metadata.streams[0];
+      var vidoeStream = ffmpeg.getVideoStream(metadata.streams);
       var width = vidoeStream.width;
       var height = vidoeStream.height;
       var resize = ffmpegConfig.thumbnail.resize;
