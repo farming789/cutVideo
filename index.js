@@ -152,7 +152,7 @@ var uploadQiniuJob = (callback) => {
     },
     //上传
     (rows, fields, callback) => {
-      console.log("uploading qiniu:"+rows);
+      console.log("uploading qiniu:"+ JSON.stringify(rows));
       async.mapLimit(rows, scheduleOptions.uploadQiniu.maplimit, execution.uploadQiniu, callback);
     }
   ], function (err, results) {
