@@ -25,6 +25,7 @@ var noVideoJob = (callback) => {
     },
     //抽取音频
     (rows, fields, callback) => {
+        console.log("no video job:"+ JSON.stringify(rows));
       async.mapLimit(rows, scheduleOptions.noVideo.maplimit, execution.novideo, callback);
     }
   ], function (err, results) {
@@ -56,6 +57,7 @@ var uploadACRCloudJob = (callback) => {
     },
     //抽取音频
     (rows, fields, callback) => {
+        console.log("uploading acrcloud job:"+ JSON.stringify(rows));
       async.mapLimit(rows, scheduleOptions.uploadACRCloud.maplimit, execution.uploadACRCloud, callback);
     }
   ], function (err, results) {
@@ -88,6 +90,7 @@ var resizeJob = (callback) => {
     },
     //降低码率
     (rows, fields, callback) => {
+       console.log("resizing job:"+ JSON.stringify(rows));
       async.mapLimit(rows, scheduleOptions.resize.maplimit, execution.resize, callback);
     }
   ], function (err, results) {
@@ -120,6 +123,7 @@ var cutJob = (callback) => {
     },
     //剪切
     (rows, fields, callback) => {
+        console.log("cutting job:"+ JSON.stringify(rows));
       async.mapLimit(rows, scheduleOptions.cut.maplimit, execution.cut, callback);
     }
   ], function (err, results) {
