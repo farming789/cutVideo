@@ -19,7 +19,7 @@ var noVideoJob = (callback) => {
   async.waterfall([
     //先获取原始视频记录
     (callback) => {
-      db.query('select * from mv_origin where novideo_status = 0 and instance_id = ? limit ? ', [
+      db.query('select * from mv_origin where handle_status=1 and  novideo_status = 0 and instance_id = ? limit ? ', [
         scheduleOptions.instance_id, scheduleOptions.noVideo.querylimit
       ], callback);
     },
@@ -82,7 +82,7 @@ var resizeJob = (callback) => {
   async.waterfall([
     //先获取原始视频记录
     (callback) => {
-      db.query('select * from mv_origin where novideo_status = 1 and resize_status = 0 and instance_id = ? limit ? ', [
+      db.query('select * from mv_origin where  handle_status=1 and novideo_status = 1 and resize_status = 0 and instance_id = ? limit ? ', [
         scheduleOptions.instance_id, scheduleOptions.resize.querylimit
       ], callback);
     },
