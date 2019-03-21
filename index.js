@@ -29,7 +29,7 @@ var noVideoJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log(err);
+      console.error(err);
     } else {
       console.log('no video job done');
     }
@@ -60,7 +60,7 @@ var uploadACRCloudJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log(err);
+      console.error(err);
     } else {
       console.log('upload acrcloud job done');
     }
@@ -92,7 +92,7 @@ var resizeJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log(err);
+      console.error(err);
     } else {
       console.log('resize job done');
     }
@@ -124,7 +124,7 @@ var cutJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log(err);
+      console.error(err);
     } else {
       console.log('cut job done');
     }
@@ -156,7 +156,7 @@ var uploadQiniuJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log(err);
+      console.error(err);
     } else {
       console.log('upload qiniu done');
     }
