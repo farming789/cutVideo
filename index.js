@@ -30,10 +30,9 @@ var noVideoJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log(err);
-    } else {
-      console.log('no video job done');
+      console.log("no video job error:"+err);
     }
+    console.log('no video job done');
     jobLocked.noVideoJob = false;
     if (callback) {
       callback(err, results);
@@ -62,10 +61,9 @@ var uploadACRCloudJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log(err);
-    } else {
-      console.log('upload acrcloud job done');
+      console.log('upload acrcloud job error:'+err);
     }
+    console.log('upload acrcloud job done');
     jobLocked.uploadACRCloudJob = false;
     if (callback) {
       callback(err, results);
@@ -95,10 +93,9 @@ var resizeJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log(err);
-    } else {
-      console.log('resize job done');
+      console.log('resize job error:'+err);
     }
+    console.log('resize job done');
     jobLocked.resizeJob = false;
     if (callback) {
       callback(err, results);
@@ -128,10 +125,9 @@ var cutJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log(err);
-    } else {
-      console.log('cut job done');
+      console.log('cut job error:'+err);
     }
+    console.log('cut job done');
     jobLocked.cutJob = false;
     if (callback) {
       callback(err, results);
@@ -161,10 +157,9 @@ var uploadQiniuJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log(err);
-    } else {
-      console.log('upload qiniu done');
+      console.log('upload qiniu error:'+err);
     }
+    console.log('upload qiniu done');
     jobLocked.uploadQiniuJob = false;
     if (callback) {
       callback(err, results);
