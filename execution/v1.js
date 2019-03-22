@@ -120,14 +120,13 @@ module.exports.novideo = (row, callback) => {
       if (err.message.indexOf('No such file or directory') != -1) {
         //源文件缺失
         row.novideo_status = -3;
-        db.updateTable('mv_origin', 'id', [row], callback);
+        db.updateTable('mv_origin', 'id', [row], function (err,result) {});
       } else if (err.message.indexOf('Invalid data found when processing input') != -1) {
         //源文件缺失
         row.novideo_status = -4;
-        db.updateTable('mv_origin', 'id', [row], callback);
-      } else {
-        callback(err, null);
+        db.updateTable('mv_origin', 'id', [row], function (err,result) {});
       }
+      callback(err, null);
     } else {
       callback(null, result.items);
     }
@@ -336,14 +335,13 @@ module.exports.resize = (row, callback) => {
         if (err.message.indexOf('No such file or directory') != -1) {
             //源文件缺失
             row.resize_status = -3;
-            db.updateTable('mv_origin', 'id', [row], callback);
+            db.updateTable('mv_origin', 'id', [row], function (err,result) {});
         } else if (err.message.indexOf('Invalid data found when processing input') != -1) {
             //源文件缺失
             row.resize_status = -4;
-            db.updateTable('mv_origin', 'id', [row], callback);
-        } else {
-            callback(err, null);
+            db.updateTable('mv_origin', 'id', [row], function (err,result) {});
         }
+        callback(err, null);
     } else {
       callback(null, result);
     }
@@ -414,14 +412,13 @@ module.exports.cut = (row, callback) => {
       if (err.message.indexOf('No such file or directory') != -1) {
         //源文件缺失
         row.cut_status = -2;
-        db.updateTable('mv_resize', 'id', [row], callback);
+        db.updateTable('mv_resize', 'id', [row], function (err,result) {});
       } else if (err.message.indexOf('Invalid data found when processing input') != -1) {
         //源文件缺失
         row.cut_status = -1;
-        db.updateTable('mv_resize', 'id', [row], callback);
-      } else {
-        callback(err, null);
+        db.updateTable('mv_resize', 'id', [row], function (err,result) {});
       }
+      callback(err, null);
     } else {
       callback(null, result);
     }
