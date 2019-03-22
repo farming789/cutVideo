@@ -333,7 +333,17 @@ module.exports.resize = (row, callback) => {
     }
   ], (err, result) => {
     if (err) {
-      callback(err, null);
+        if (err.message.indexOf('No such file or directory') != -1) {
+            //源文件缺失
+            row.resize_status = -3;
+            db.updateTable('mv_origin', 'id', [row], callback);
+        } else if (err.message.indexOf('Invalid data found when processing input') != -1) {
+            //源文件缺失
+            row.resize_status = -4;
+            db.updateTable('mv_origin', 'id', [row], callback);
+        } else {
+            callback(err, null);
+        }
     } else {
       callback(null, result);
     }
