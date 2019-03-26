@@ -19,7 +19,7 @@ var noVideoJob = (callback) => {
   async.waterfall([
     //先获取原始视频记录
     (callback) => {
-      db.query('select * from mv_origin where novideo_status = 0 and instance_id = ? limit ? ', [
+      db.query('select id,acr_bucket_name,file_path,novideo_status,file_title,updated_at from mv_origin where novideo_status = 0 and instance_id = ? limit ? ', [
         scheduleOptions.instance_id, scheduleOptions.noVideo.querylimit
       ], callback);
     },
@@ -50,7 +50,7 @@ var uploadACRCloudJob = (callback) => {
   console.log('upload acrcloud job begin');
   async.waterfall([
     (callback) => {
-      db.query('select * from mv_novideos where upload_status = 0 and instance_id = ? limit ? ', [
+      db.query('select id,file_name,file_title,file_path,file_fingerprint,acr_bucket_name,upload_status from mv_novideos where upload_status = 0 and instance_id = ? limit ? ', [
         scheduleOptions.instance_id, scheduleOptions.uploadACRCloud.querylimit
       ], callback);
     },
@@ -82,7 +82,7 @@ var resizeJob = (callback) => {
   async.waterfall([
     //先获取原始视频记录
     (callback) => {
-      db.query('select * from mv_origin where novideo_status = 1 and resize_status = 0 and instance_id = ? limit ? ', [
+      db.query('select id,file_path,file_title,acr_bucket_name,resize_status,resize from mv_origin where novideo_status = 1 and resize_status = 0 and instance_id = ? limit ? ', [
         scheduleOptions.instance_id, scheduleOptions.resize.querylimit
       ], callback);
     },
@@ -114,7 +114,7 @@ var cutJob = (callback) => {
   async.waterfall([
     //先获取原始视频记录
     (callback) => {
-      db.query('select * from mv_resize where cut_status = 0 and instance_id = ? limit ? ', [
+      db.query('select id,file_path,file_name,file_title,cut_status from mv_resize where cut_status = 0 and instance_id = ? limit ? ', [
         scheduleOptions.instance_id, scheduleOptions.cut.querylimit
       ], callback);
     },
@@ -146,7 +146,7 @@ var uploadQiniuJob = (callback) => {
   async.waterfall([
     //先获取原始视频记录
     (callback) => {
-      db.query('select * from mv_cut where upload_status = 0 and instance_id = ? limit ? ', [
+      db.query('select id,file_name,file_path,upload_status from mv_cut where upload_status = 0 and instance_id = ? limit ? ', [
         scheduleOptions.instance_id, scheduleOptions.uploadQiniu.querylimit
       ], callback);
     },
