@@ -231,10 +231,10 @@ module.exports.resize = (row, callback) => {
         var resize = ffmpegConfig.resize[row.resize];
         //源文件码率大于目标码率，则降码处理
         var options = {
-          audioBitrate: vidoeStream.bit_rate > resize.videoBitrate * 1024
+          videoBitrate: vidoeStream.bit_rate > resize.videoBitrate * 1024
             ? resize.videoBitrate
             : 0,
-          videoBitrate: audioStream.bit_rate > resize.audioBitrate * 1024
+          audioBitrate: audioStream.bit_rate > resize.audioBitrate * 1024
             ? resize.audioBitrate
             : 0
         }
