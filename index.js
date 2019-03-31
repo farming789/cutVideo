@@ -19,7 +19,7 @@ var noVideoJob = (callback) => {
   async.waterfall([
     //先获取原始视频记录
     (callback) => {
-      db.query('select id,acr_bucket_name,file_path,novideo_status,file_title,updated_at from mv_origin where novideo_status = 0 and instance_id = ? limit ? ', [
+      db.query('select id,acr_bucket_name,file_path,novideo_status,file_title,updated_at from mv_origin where handle_status=1 and novideo_status = 0 and instance_id = ? limit ? ', [
         scheduleOptions.instance_id, scheduleOptions.noVideo.querylimit
       ], callback);
     },
@@ -30,7 +30,7 @@ var noVideoJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log("no video job error:"+err);
+      console.error("no video job error:"+err);
     }
     console.log('no video job done');
     jobLocked.noVideoJob = false;
@@ -61,7 +61,7 @@ var uploadACRCloudJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log('upload acrcloud job error:'+err);
+      console.error('upload acrcloud job error:'+err);
     }
     console.log('upload acrcloud job done');
     jobLocked.uploadACRCloudJob = false;
@@ -82,7 +82,7 @@ var resizeJob = (callback) => {
   async.waterfall([
     //先获取原始视频记录
     (callback) => {
-      db.query('select id,file_path,file_title,acr_bucket_name,resize_status,resize from mv_origin where novideo_status = 1 and resize_status = 0 and instance_id = ? limit ? ', [
+      db.query('select id,file_path,file_title,acr_bucket_name,resize_status,resize from mv_origin where handle_status=1 and novideo_status = 1 and resize_status = 0 and instance_id = ? limit ? ', [
         scheduleOptions.instance_id, scheduleOptions.resize.querylimit
       ], callback);
     },
@@ -93,7 +93,7 @@ var resizeJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log('resize job error:'+err);
+      console.error('resize job error:'+err);
     }
     console.log('resize job done');
     jobLocked.resizeJob = false;
@@ -125,7 +125,7 @@ var cutJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log('cut job error:'+err);
+      console.error('cut job error:'+err);
     }
     console.log('cut job done');
     jobLocked.cutJob = false;
@@ -157,7 +157,7 @@ var uploadQiniuJob = (callback) => {
     }
   ], function (err, results) {
     if (err) {
-      console.log('upload qiniu error:'+err);
+      console.error('upload qiniu error:'+err);
     }
     console.log('upload qiniu done');
     jobLocked.uploadQiniuJob = false;
