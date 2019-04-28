@@ -5,6 +5,7 @@ var ffmpeg = require('./lib/ffmpeg');
 var acrcloud = require('./lib/acrcloud');
 var async = require('async');
 var execution = require('./execution/v1');
+var syncJob=require('./execution/syncJob');
 var scheduleOptions = require('./config/schedule');
 var jobLocked = {};
 
@@ -167,6 +168,74 @@ var uploadQiniuJob = (callback) => {
   });
 };
 
+/**
+ * 同步片源和片源剧集
+ * @param callback
+ */
+var syncProjectJob=(callback)=>{
+    if (jobLocked.syncProjectJob) {
+        console.log('sync project job skip');
+        return;
+    } else {
+        jobLocked.syncProjectJob = true;
+    }
+    console.log('sync project job begin');
+
+    //查询出审核通过并且未同步的数据进行同步
+    async.waterfall([
+        (next)=>{
+            db.query('select * from mv_origin where audit_status=1 and sync_status=0 limit ?',[scheduleOptions.syncProject,querylimit],next);
+        },
+        (rows,fields,next)=>{
+            async.mapLimit(rows,scheduleOptions.syncProject.maplimit,syncJob.syncProject,next);
+        },
+    ],function (err,results) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('sync project job done');
+        }
+        jobLocked.syncProjectJob = false;
+        if (callback) {
+            callback(err, results);
+        }
+    })
+}
+
+/**
+ * 同步片源切片
+ * @param callback
+ */
+var syncCutJob=(callback)=>{
+    if (jobLocked.syncCutJob) {
+        console.log('sync cut job skip');
+        return;
+    } else {
+        jobLocked.syncCutJob = true;
+    }
+    console.log('sync cut job begin');
+
+    //查询出审核通过并且已经同步过片源的数据，但是没有同步过切片的数据
+    async.waterfall([
+        (next)=>{
+            db.query('select * from mv_origin where audit_status=1 and sync_status=1 and sync_cut_status=0 limit ?',[scheduleOptions.syncCut,querylimit],next);
+        },
+        (rows,fields,next)=>{
+            async.mapLimit(rows,scheduleOptions.syncCut.maplimit,syncJob.syncCut,next);
+        },
+    ],function (err,results) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('sync project job done');
+        }
+        jobLocked.syncProjectJob = false;
+        if (callback) {
+            callback(err, results);
+        }
+    })
+
+}
 
 process.env.TZ = "Asia/Shanghai";
 Date.prototype.TimeZone = new Map([
@@ -199,6 +268,8 @@ Date.prototype.zoneDate = function(){
     scheduleOptions.resize.enabled && ns.scheduleJob(scheduleOptions.resize.cron, (fireDate) => resizeJob());
     scheduleOptions.cut.enabled && ns.scheduleJob(scheduleOptions.cut.cron, (fireDate) => cutJob());
     scheduleOptions.uploadQiniu.enabled && ns.scheduleJob(scheduleOptions.uploadQiniu.cron, (fireDate) => uploadQiniuJob());
+    scheduleOptions.syncProject.enabled && ns.scheduleJob(scheduleOptions.syncProject.cron, (fireDate) => syncProjectJob());
+    scheduleOptions.syncCut.enabled && ns.scheduleJob(scheduleOptions.syncCut.cron, (fireDate) => syncCutJob());
     console.log('xj schedule start.');
   }
 })();

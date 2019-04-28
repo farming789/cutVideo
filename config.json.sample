@@ -12,6 +12,19 @@
       "user":"feimu139",
       "privateKeyPath":"/Users/yuhuaming/.ssh/id_rsa"
   },
+  "dbFeimu": {
+     "connectionLimit": 20,
+          "host": "feimumaster.mysql.rds.aliyuncs.com",
+          "user": "root",
+          "password": "feimu!@#0",
+          "database": "feimu-test",
+          "timezone": "08:00"
+  },
+  "sshFeimu":{
+      "host":"47.100.255.139",
+      "user":"feimu139",
+      "privateKeyPath":"/Users/yuhuaming/.ssh/id_rsa"
+  },
   "acrcloud": {
     "dataType":"fingerprint",
     "console": {
@@ -158,5 +171,12 @@
        "querylimit": 5,
        "maplimit": 5
      }
-   }
+   },
+    "tvsonarUrl":{
+          "url":"http://open.feimu.com/api/",
+            //批量获取主键,需要指定数量
+          "getIds":"getids/num/",
+           //获取单个主键
+          "getId":"getid"
+     }
 }
