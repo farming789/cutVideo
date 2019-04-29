@@ -5,7 +5,8 @@
       "user": "root",
       "password": "feimu!@#0",
       "database": "feimu-cut-test",
-      "timezone": "08:00"
+      "timezone": "08:00",
+       "supportBigNumbers":true
     },
   "ssh":{
       "host":"47.100.255.139",
@@ -18,7 +19,8 @@
           "user": "root",
           "password": "feimu!@#0",
           "database": "feimu-test",
-          "timezone": "08:00"
+          "timezone": "08:00",
+           "supportBigNumbers":true
   },
   "sshFeimu":{
       "host":"47.100.255.139",
@@ -170,13 +172,23 @@
        "cron": "*/1 * * * *",
        "querylimit": 5,
        "maplimit": 5
-     }
+     },
+     "syncProject":{
+        "enabled": true,
+        "cron": "*/1 * * * *",
+        "querylimit": 5,
+        "maplimit": 5
+      },
+      "syncCut":{
+        "enabled": true,
+        "cron": "*/1 * * * *",
+        "querylimit": 5,
+        "maplimit": 5
+      }
    },
     "tvsonarUrl":{
-          "url":"http://open.feimu.com/api/",
-            //批量获取主键,需要指定数量
-          "getIds":"getids/num/",
-           //获取单个主键
-          "getId":"getid"
+        "url" : "http://open.feimu.com/api/",
+        "getIds" : "getids/num/",
+        "getId": "getid"
      }
 }

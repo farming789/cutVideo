@@ -2,8 +2,10 @@ var db = require('../lib/db_none_transational');
 var dbFeimu=require('../lib/dbFeimu');
 var idProvider=require('../lib/IdProvider');
 var async = require('async');
+var moment = require('moment');
 
 module.exports.syncProject = (mvOriginItem,callback)=>{
+    console.log("即将同步的片源数据："+JSON.stringify(mvOriginItem));
     async.waterfall([(next)=>{
         //同步feimu数据库的project表  片名，作品形式 ，总集数，豆瓣链接
         dbFeimu.query('select * from fm_project where p_name=? and p_delete_flag=1',[mvOriginItem.video_name],next)
@@ -15,6 +17,7 @@ module.exports.syncProject = (mvOriginItem,callback)=>{
             insertProject(mvOriginItem,next);
         }
     },(pId,next)=>{
+        console.log("对应的片源id是："+ pId);
         //判断feimu数据库的fm_project_episode是否有该剧集
         dbFeimu.query('select * from fm_project_episode where p_id=? and pe_file_name=? and pe_delete_flag=1',[pId,mvOriginItem.file_title],function (error,rows,fields) {
             next(error,pId,rows);
@@ -27,6 +30,7 @@ module.exports.syncProject = (mvOriginItem,callback)=>{
             insertProjectEpisode(mvOriginItem,pId,next);
         }
     },(pId,peId,next)=>{
+        console.log("对应的片源id和剧集id是："+ pId+","+peId);
         //更新切片数据库的mv_origin表的同步状态,pId,peId
         var newOrigin={};
         newOrigin.id=mvOriginItem.id;
@@ -41,7 +45,7 @@ module.exports.syncProject = (mvOriginItem,callback)=>{
             newOrigin.id=mvOriginItem.id;
             newOrigin.sync_status=-1;
             newOrigin.sync_at=new Date().zoneDate();
-            db.updateTable('mv_origin','id',[newOrigin],next)
+            db.updateTable('mv_origin','id',[newOrigin],function (err,result) {})
             callback(error,null);
         }else {
             callback(null,results);
@@ -80,6 +84,7 @@ var insertProject=(mvOrigin,callback)=>{
                 }
             });
         },(next)=>{
+            console.log("新增project:",JSON.stringify(project));
             dbFeimu.insertIgnoreTable('fm_project',[project],next)
         },
     ],function (error,result) {
@@ -99,6 +104,7 @@ var insertProjectEpisode=(mvOrigin,pId,callback)=>{
                     console.log('插入fm_project_episode表时，获取主键失败');
                     next(error,null);
                 }else {
+                    console.log("获取的剧集id是："+id);
                     episode.pe_id=id;
                     episode.p_id=pId;
                     mvOrigin.pe_id=id;
@@ -106,6 +112,7 @@ var insertProjectEpisode=(mvOrigin,pId,callback)=>{
                     episode.pe_file_name=mvOrigin.file_title;
                     episode.pe_sets=mvOrigin.sets;
                     episode.pe_audio_status=1;
+                    next();
                 }
             });
         },(next)=>{
@@ -114,16 +121,35 @@ var insertProjectEpisode=(mvOrigin,pId,callback)=>{
                     next(error,null);
                 }else {
                     if(rows&&rows.length>0){
+                        console.log("音频数据："+JSON.stringify(rows));
                         episode.pe_acr_id = rows[0].acr_id;
                     }
                     next();
                 }
             })
         },(next)=>{
+            if(mvOrigin.douban_url&&mvOrigin.douban_url.length>0){
+                dbFeimu.query('select * from fm_movie_resources where mr_db_url=? and mr_delete_flag=1',[mvOrigin.douban_url],function (error,rows,fields) {
+                    if(error){
+                        next(error);
+                    }else {
+                        console.log("获取的影视剧数据" + JSON.stringify(rows));
+                        if(rows&&rows.length>0){
+                            episode.mr_id=rows[0].mr_id;
+                        }
+                        next();
+                    }
+                })
+            }else {
+                next()
+            }
+        },(next)=>{
+            console.log("新增的剧集数据："+JSON.stringify(episode));
             dbFeimu.insertIgnoreTable('fm_project_episode',[episode],next);
         }
     ],function (error,result) {
         if(error){
+            console.log("新增剧集失败:"+error);
             callback(error);
         }else {
             callback(null,episode.p_id,episode.pe_id);
@@ -164,24 +190,43 @@ var updateProjectEpisode=(mvOrigin,episode,callback)=>{
     })
 }
 
-module.exports.syncCut = (row,callback)=>{
-    var pId = row.p_id;
-    var peId = row.pe_id;
-    async.waterfall([(next)=>{
-        //查询切片库中该片源的所有片段
-        db.query('select * from mv_cut where file_origin_title=?',[row.file_title],next);
+module.exports.syncCut = (originItem,callback)=>{
+    var pId = originItem.p_id;
+    var peId = originItem.pe_id;
+    async.waterfall([
+        (next)=>{
+            //查询飞幕数据库中剧集的切片状态
+            dbFeimu.query('select pe_audio_status ,pe_cut_status,pe_status from fm_project_episode where pe_id=? and pe_delete_flag=1',[peId],next)
+        },
+        (rows,fields,next)=>{
+        if(rows&&rows.length>0){
+            //如果已经同步好了切片，则不再同步
+            if(rows[0].pe_cut_status==1){
+                next(null,[],null);
+            }else {
+                //剧集数据存在，并且未同步过切片数据，则查询切片库中该片源的所有片段，进行同步
+                db.query('select * from mv_cut where file_origin_title=?',[originItem.file_title],next);
+            }
+        }else {
+            //不存在剧集数据，则不同步切片数据
+            next(null,[],null);
+        }
     },(rows,fields,next)=>{
-        idProvider.getIds(rows.length,(error,thirdIds)=>{
-            if(!thirdIds||thirdIds.length==0){
-                console.error('获取主键失败');
-                throw error;
-            }
-            if(thirdIds.length!=rows.length){
-                console.error('主键的数量不对');
-                throw error;
-            }
-            next(error,thirdIds,rows);
-        });
+        if(rows&&rows.length>0){
+            idProvider.getIds(rows.length,(error,thirdIds)=>{
+                if(!thirdIds||thirdIds.length==0){
+                    console.error('获取主键失败');
+                    throw error;
+                }
+                if(thirdIds.length!=rows.length){
+                    console.error('主键的数量不对');
+                    throw error;
+                }
+                next(error,thirdIds,rows);
+            });
+        }else {
+            next(null,[],[]);
+        }
     },(thirdIds,rows,next)=>{
         if(rows&&rows.length>0){
             var datas=[];
@@ -196,25 +241,31 @@ module.exports.syncCut = (row,callback)=>{
                 throw new Error('转化失败');
             }
             //同步到feimu库
-            doSyncCut(data,peId,next)
+            doSyncCut(datas,peId,next)
         }else {
             next(null,rows);
         }
-    },(next)=>{
-        //更新切片库的mv_origin的sync_cut_status，sync_cut_at
-        var item={};
-        item.id=row.id;
-        item.sync_cut_status=1;
-        item.sync_cut_at=new Date().zoneDate();
-        db.updateTable('mv_origin','id',[item],next);
     }],function (error,results) {
         if(error){
+            var newOrigin={};
+            newOrigin.id=originItem.id;
+            newOrigin.sync_cut_status = -1;
+            newOrigin.sync_at=new Date().zoneDate();
+            db.updateTable('mv_origin','id',[newOrigin],function (err,result) {})
             callback(error,null);
         }else {
+            var item={};
+            item.id=originItem.id;
+            item.sync_cut_status=1;
+            item.sync_cut_at=new Date().zoneDate();
+            db.updateTable('mv_origin','id',[item],function (err,result) {});
             callback(null,results);
         }
     })
 }
+
+
+
 
 var doSyncCut=function (datas,peId,callback) {
     var poolfeimu=dbFeimu.pool();
@@ -224,7 +275,6 @@ var doSyncCut=function (datas,peId,callback) {
             console.log("获取连接失败");
             throw err;
         }
-        console.log(con);
         con.beginTransaction(function (err) {
             if (err) {
                 console.log("开启事物失败");
@@ -232,11 +282,13 @@ var doSyncCut=function (datas,peId,callback) {
             }
             async.waterfall([
                 (next)=>{
-                    var sql= getInsertCutSql(datas);
-                    //批量插入飞幕库的fm_episode_part表
-                    con.query(sql,[],next);
-                },(next1)=>{
-                    con.query('select pe_audio_status ,pe_cut_status,pe_status from fm_project_episode where pe_id=?',[peId],next)
+                    async.map(datas,(item,callback)=>{
+                        con.query('insert into fm_episode_part set ?',item,function (error,result) {
+                            callback(error,result);
+                        });
+                    },next);
+                },(result,next)=>{
+                    con.query('select pe_audio_status ,pe_cut_status,pe_status from fm_project_episode where pe_id=? and pe_delete_flag=1',[peId],next);
                 },(rows,fields,next)=>{
                     if(rows[0].pe_audio_status==1){
                         //更新pe_cut_status和pe_status
@@ -259,7 +311,7 @@ var doSyncCut=function (datas,peId,callback) {
                                 callback(error1);
                             });
                         }
-                        console.log('result:' + result)
+                        console.log('result:' + JSON.stringify(result));
                         callback(null,result);
                     })
                 }
@@ -283,15 +335,15 @@ var convertCut=(cutOld,thirdId)=>{
     data.ep_duration_time=duration;
     data.ep_status='B';
     data.ep_comments='';
-    data.ep_create_time= new Date().zoneDate();
-    data.ep_update_time= new Date().zoneDate();
+    data.ep_create_time= moment(new Date().zoneDate()).format('YYYY-MM-DD HH:mm:ss');
+    data.ep_update_time= data.ep_create_time;
     data.ep_delete_flag=1;
 
     return data;
 }
 
 var getInsertCutSql=(datas)=>{
-    var sql="insert into fm_episode_part ('ep_id','p_id','pe_id','ep_video_url','ep_start_at','ep_end_at','ep_duration_time','ep_status','ep_comments','ep_create_time','ep_update_time','ep_delete_flag') values ";
+    var sql="insert into fm_episode_part (ep_id,p_id,pe_id,ep_video_url,ep_start_at,ep_end_at,ep_duration_time,ep_status,ep_comments,ep_create_time,ep_update_time,ep_delete_flag) values ";
     var values='';
     for(var j=0;j<datas.length;j++) {
         var data = datas[j];
@@ -299,14 +351,34 @@ var getInsertCutSql=(datas)=>{
         value += data.ep_id + ",";
         value += data.p_id + ",";
         value += data.pe_id + ",";
-        value += data.ep_video_url + ",";
-        value += data.ep_start_at + ",";
-        value += data.ep_end_at + ",";
-        value += data.ep_duration_time + ",";
-        value += data.ep_status + ",";
-        value += data.ep_comments + ",";
-        value += data.ep_create_time + ",";
-        value += data.ep_update_time + ",";
+
+        if(data.ep_video_url){
+            value += data.ep_video_url + ",";
+        }else {
+            value += "'',"
+        }
+        if(data.ep_start_at){
+            value += data.ep_start_at + ",";
+        }else {
+            value += "0,";
+        }
+
+        if(data.ep_end_at){
+            value += data.ep_end_at + ",";
+        }else {
+            value +=  "0,";
+        }
+
+        if(data.ep_duration_time){
+            value += data.ep_duration_time + ",";
+        }else {
+            value += '0,';
+        }
+
+        value += "'" +data.ep_status + "',";
+        value += "'" + data.ep_comments + "',";
+        value += "'" + moment(data.ep_create_time).format('YYYY-MM-DD HH:mm:ss') + "',";
+        value += "'" + moment(data.ep_update_time).format('YYYY-MM-DD HH:mm:ss') + "',";
         value += data.ep_delete_flag;
         value += '),';
 

@@ -7,6 +7,7 @@ var async = require('async');
 var execution = require('./execution/v1');
 var syncJob=require('./execution/syncJob');
 var scheduleOptions = require('./config/schedule');
+var idProvider = require('./lib/IdProvider');
 var jobLocked = {};
 
 var noVideoJob = (callback) => {
@@ -184,7 +185,7 @@ var syncProjectJob=(callback)=>{
     //查询出审核通过并且未同步的数据进行同步
     async.waterfall([
         (next)=>{
-            db.query('select * from mv_origin where audit_status=1 and sync_status=0 limit ?',[scheduleOptions.syncProject,querylimit],next);
+            db.query('select * from mv_origin where audit_status=1 and sync_status=0 limit ?',[scheduleOptions.syncProject.querylimit],next);
         },
         (rows,fields,next)=>{
             async.mapLimit(rows,scheduleOptions.syncProject.maplimit,syncJob.syncProject,next);
@@ -215,10 +216,11 @@ var syncCutJob=(callback)=>{
     }
     console.log('sync cut job begin');
 
+
     //查询出审核通过并且已经同步过片源的数据，但是没有同步过切片的数据
     async.waterfall([
         (next)=>{
-            db.query('select * from mv_origin where audit_status=1 and sync_status=1 and sync_cut_status=0 limit ?',[scheduleOptions.syncCut,querylimit],next);
+            db.query('select * from mv_origin where audit_status=1 and sync_status=1 and sync_cut_status=0 limit ?',[scheduleOptions.syncCut.querylimit],next);
         },
         (rows,fields,next)=>{
             async.mapLimit(rows,scheduleOptions.syncCut.maplimit,syncJob.syncCut,next);
@@ -229,7 +231,7 @@ var syncCutJob=(callback)=>{
         } else {
             console.log('sync project job done');
         }
-        jobLocked.syncProjectJob = false;
+        jobLocked.syncCutJob = false;
         if (callback) {
             callback(err, results);
         }
@@ -259,17 +261,27 @@ Date.prototype.zoneDate = function(){
 };
 
 (() => {
-  var args = process.argv.slice(2);
-  if (args.length == 1) {
-    eval(args[0] + '()');
-  } else {
-    scheduleOptions.noVideo.enabled && ns.scheduleJob(scheduleOptions.noVideo.cron, (fireDate) => noVideoJob());
-    scheduleOptions.uploadACRCloud.enabled && ns.scheduleJob(scheduleOptions.uploadACRCloud.cron, (fireDate) => uploadACRCloudJob());
-    scheduleOptions.resize.enabled && ns.scheduleJob(scheduleOptions.resize.cron, (fireDate) => resizeJob());
-    scheduleOptions.cut.enabled && ns.scheduleJob(scheduleOptions.cut.cron, (fireDate) => cutJob());
-    scheduleOptions.uploadQiniu.enabled && ns.scheduleJob(scheduleOptions.uploadQiniu.cron, (fireDate) => uploadQiniuJob());
-    scheduleOptions.syncProject.enabled && ns.scheduleJob(scheduleOptions.syncProject.cron, (fireDate) => syncProjectJob());
-    scheduleOptions.syncCut.enabled && ns.scheduleJob(scheduleOptions.syncCut.cron, (fireDate) => syncCutJob());
-    console.log('xj schedule start.');
-  }
+
+    // idProvider.getId(function (error,ids) {
+    //     console.log(error);
+    //     console.log(ids);
+    // });
+    // idProvider.getIds(3,function (error,ids) {
+    //     console.log(error);
+    //     console.log(ids);
+    // })
+    syncCutJob();
+  // var args = process.argv.slice(2);
+  // if (args.length == 1) {
+  //   eval(args[0] + '()');
+  // } else {
+  //   scheduleOptions.noVideo.enabled && ns.scheduleJob(scheduleOptions.noVideo.cron, (fireDate) => noVideoJob());
+  //   scheduleOptions.uploadACRCloud.enabled && ns.scheduleJob(scheduleOptions.uploadACRCloud.cron, (fireDate) => uploadACRCloudJob());
+  //   scheduleOptions.resize.enabled && ns.scheduleJob(scheduleOptions.resize.cron, (fireDate) => resizeJob());
+  //   scheduleOptions.cut.enabled && ns.scheduleJob(scheduleOptions.cut.cron, (fireDate) => cutJob());
+  //   scheduleOptions.uploadQiniu.enabled && ns.scheduleJob(scheduleOptions.uploadQiniu.cron, (fireDate) => uploadQiniuJob());
+  //   scheduleOptions.syncProject.enabled && ns.scheduleJob(scheduleOptions.syncProject.cron, (fireDate) => syncProjectJob());
+  //   scheduleOptions.syncCut.enabled && ns.scheduleJob(scheduleOptions.syncCut.cron, (fireDate) => syncCutJob());
+  //   console.log('xj schedule start.');
+  // }
 })();
