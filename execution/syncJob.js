@@ -24,7 +24,12 @@ module.exports.syncProject = (mvOriginItem,callback)=>{
         })
     },(pId,rows,next)=>{
         if(rows&&rows.length>0){
-            updateProjectEpisode(mvOriginItem,rows[0],next)
+            //如果已经同步了音频，则不做处理
+            if(rows[0].pe_audio_status==1){
+                next(null,pId,rows[0].pe_id);
+            }else {
+                updateProjectEpisode(mvOriginItem,rows[0],next)
+            }
         }else {
             //如果不存在则，新增片源剧集
             insertProjectEpisode(mvOriginItem,pId,next);
@@ -174,11 +179,11 @@ var updateProjectEpisode=(mvOrigin,episode,callback)=>{
             dbFeimu.query('select pe_audio_status , pe_cut_status, pe_status from fm_project_episode where pe_id=?',[episode.pe_id],next)
         },(rows,fields,next)=>{
             if(rows[0].pe_cut_status==1){
-                //更新pe_cut_status和pe_status
-                dbFeimu.query('update fm_project_episode set pe_cut_status=1,pe_status=1,pe_acr_id=?, where pe_id=?',[episode.pe_acr_id,episode.pe_id],next);
+                //更新pe_audio_status和pe_status
+                dbFeimu.query('update fm_project_episode set pe_audio_status=1,pe_status=1,pe_acr_id=?, where pe_id=?',[episode.pe_acr_id,episode.pe_id],next);
             }else {
-                //仅仅更新pe_cut_status
-                dbFeimu.query('update fm_project_episode set pe_cut_status=1,pe_acr_id=? where pe_id=?',[episode.pe_acr_id,episode.pe_id],next);
+                //仅仅更新pe_audio_status
+                dbFeimu.query('update fm_project_episode set pe_audio_status=1,pe_acr_id=? where pe_id=?',[episode.pe_acr_id,episode.pe_id],next);
             }
         }
     ],function (error,result) {
