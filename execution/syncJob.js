@@ -89,8 +89,33 @@ var insertProject=(mvOrigin,callback)=>{
                 }
             });
         },(next)=>{
+            if(mvOrigin.douban_url&&mvOrigin.douban_url.length>0){
+                dbFeimu.query('select * from fm_movie_resources where mr_db_url=? and mr_delete_flag=1',[mvOrigin.douban_url],function (error,rows,fields) {
+                    if(error){
+                        next(error);
+                    }else {
+                        console.log("获取的影视剧数据" + JSON.stringify(rows));
+                        if(rows&&rows.length>0){
+                            project.mr_id=rows[0].mr_id;
+                        }
+                        next();
+                    }
+                })
+            }else {
+                next()
+            }
+        },(next)=>{
             console.log("新增project:",JSON.stringify(project));
             dbFeimu.insertIgnoreTable('fm_project',[project],next)
+        },(results,next)=>{
+            if(project.mr_id&&project.mr_id>0){
+                var item={};
+                item.mr_id=project.mr_id;
+                item.p_id=project.p_id;
+                console.log("更新fm_movie_resources影视剧表:",JSON.stringify(item));
+                dbFeimu.updateTable('fm_movie_resources',"mr_id",[item],function (error,result) {});
+            }
+            next();
         },
     ],function (error,result) {
         if(error){
@@ -132,22 +157,6 @@ var insertProjectEpisode=(mvOrigin,pId,callback)=>{
                     next();
                 }
             })
-        },(next)=>{
-            if(mvOrigin.douban_url&&mvOrigin.douban_url.length>0){
-                dbFeimu.query('select * from fm_movie_resources where mr_db_url=? and mr_delete_flag=1',[mvOrigin.douban_url],function (error,rows,fields) {
-                    if(error){
-                        next(error);
-                    }else {
-                        console.log("获取的影视剧数据" + JSON.stringify(rows));
-                        if(rows&&rows.length>0){
-                            episode.mr_id=rows[0].mr_id;
-                        }
-                        next();
-                    }
-                })
-            }else {
-                next()
-            }
         },(next)=>{
             console.log("新增的剧集数据："+JSON.stringify(episode));
             dbFeimu.insertIgnoreTable('fm_project_episode',[episode],next);
@@ -327,7 +336,7 @@ var doSyncCut=function (datas,peId,callback) {
 
 var convertCut=(cutOld,thirdId)=>{
     var data={};
-    data.ep_video_url=cutOld.qinIu_key;
+    data.ep_video_url=cutOld.qiniu_key;
 
     var cutOptions= JSON.parse(cutOld.cut_options);
     var startTime = cutOptions.startTime;
