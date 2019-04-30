@@ -73,6 +73,8 @@ var insertProject=(mvOrigin,callback)=>{
                     project.p_toatl_sets=mvOrigin.total_sets;
                     project.p_douban_url=mvOrigin.douban_url;
                     project.p_status=2;
+                    project.p_create_time=new Date().zoneDate();
+                    project.p_update_time=new Date().zoneDate();
                     next();
                 }
             });
@@ -142,6 +144,8 @@ var insertProjectEpisode=(mvOrigin,pId,callback)=>{
                     episode.pe_file_name=mvOrigin.file_title;
                     episode.pe_sets=mvOrigin.sets;
                     episode.pe_audio_status=1;
+                    episode.pe_create_time=new Date().zoneDate();
+                    episode.pe_update_time=new Date().zoneDate();
                     next();
                 }
             });
