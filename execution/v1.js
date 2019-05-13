@@ -417,6 +417,9 @@ module.exports.cut = (row, callback) => {
         //源文件缺失
         row.cut_status = -1;
         db.updateTable('mv_resize', 'id', [row], function (err,result) {});
+      }else {
+          row.cut_status = -3;
+          db.updateTable('mv_resize', 'id', [row], function (err,result) {});
       }
       callback(err, null);
     } else {
