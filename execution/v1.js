@@ -125,6 +125,10 @@ module.exports.novideo = (row, callback) => {
         //源文件缺失
         row.novideo_status = -4;
         db.updateTable('mv_origin', 'id', [row], function (err,result) {});
+      } else {
+          //未知
+          row.novideo_status = -5;
+          db.updateTable('mv_origin', 'id', [row], function (err,result) {});
       }
       callback(err, null);
     } else {
@@ -340,6 +344,10 @@ module.exports.resize = (row, callback) => {
             //源文件缺失
             row.resize_status = -4;
             db.updateTable('mv_origin', 'id', [row], function (err,result) {});
+        } else {
+            //未知
+            row.resize_status = -5;
+            db.updateTable('mv_origin', 'id', [row], function (err,result) {});
         }
         callback(err, null);
     } else {
@@ -418,7 +426,8 @@ module.exports.cut = (row, callback) => {
         row.cut_status = -1;
         db.updateTable('mv_resize', 'id', [row], function (err,result) {});
       }else {
-          row.cut_status = -3;
+        //未知
+          row.cut_status = -5;
           db.updateTable('mv_resize', 'id', [row], function (err,result) {});
       }
       callback(err, null);
