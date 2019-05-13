@@ -174,13 +174,13 @@
        "maplimit": 5
      },
      "syncProject":{
-        "enabled": true,
+        "enabled": false,
         "cron": "*/1 * * * *",
         "querylimit": 5,
         "maplimit": 5
       },
       "syncCut":{
-        "enabled": true,
+        "enabled": false,
         "cron": "*/1 * * * *",
         "querylimit": 5,
         "maplimit": 5
