@@ -263,7 +263,9 @@ Date.prototype.zoneDate = function(){
 (() => {
   var args = process.argv.slice(2);
   if (args.length == 1) {
-    eval(args[0] + '()');
+      setTimeout(function () {
+          eval(args[0] + '()');
+      },5000)
   } else {
     scheduleOptions.noVideo.enabled && ns.scheduleJob(scheduleOptions.noVideo.cron, (fireDate) => noVideoJob());
     scheduleOptions.uploadACRCloud.enabled && ns.scheduleJob(scheduleOptions.uploadACRCloud.cron, (fireDate) => uploadACRCloudJob());
