@@ -261,19 +261,23 @@ Date.prototype.zoneDate = function(){
 };
 
 (() => {
-  var args = process.argv.slice(2);
-  if (args.length == 1) {
-      setTimeout(function () {
-          eval(args[0] + '()');
-      },5000)
-  } else {
-    scheduleOptions.noVideo.enabled && ns.scheduleJob(scheduleOptions.noVideo.cron, (fireDate) => noVideoJob());
-    scheduleOptions.uploadACRCloud.enabled && ns.scheduleJob(scheduleOptions.uploadACRCloud.cron, (fireDate) => uploadACRCloudJob());
-    scheduleOptions.resize.enabled && ns.scheduleJob(scheduleOptions.resize.cron, (fireDate) => resizeJob());
-    scheduleOptions.cut.enabled && ns.scheduleJob(scheduleOptions.cut.cron, (fireDate) => cutJob());
-    scheduleOptions.uploadQiniu.enabled && ns.scheduleJob(scheduleOptions.uploadQiniu.cron, (fireDate) => uploadQiniuJob());
-    scheduleOptions.syncProject.enabled && ns.scheduleJob(scheduleOptions.syncProject.cron, (fireDate) => syncProjectJob());
-    scheduleOptions.syncCut.enabled && ns.scheduleJob(scheduleOptions.syncCut.cron, (fireDate) => syncCutJob());
-    console.log('xj schedule start.');
-  }
+
+
+    syncJob.syncOldData();
+
+  // var args = process.argv.slice(2);
+  // if (args.length == 1) {
+  //     setTimeout(function () {
+  //         eval(args[0] + '()');
+  //     },5000)
+  // } else {
+  //   scheduleOptions.noVideo.enabled && ns.scheduleJob(scheduleOptions.noVideo.cron, (fireDate) => noVideoJob());
+  //   scheduleOptions.uploadACRCloud.enabled && ns.scheduleJob(scheduleOptions.uploadACRCloud.cron, (fireDate) => uploadACRCloudJob());
+  //   scheduleOptions.resize.enabled && ns.scheduleJob(scheduleOptions.resize.cron, (fireDate) => resizeJob());
+  //   scheduleOptions.cut.enabled && ns.scheduleJob(scheduleOptions.cut.cron, (fireDate) => cutJob());
+  //   scheduleOptions.uploadQiniu.enabled && ns.scheduleJob(scheduleOptions.uploadQiniu.cron, (fireDate) => uploadQiniuJob());
+  //   scheduleOptions.syncProject.enabled && ns.scheduleJob(scheduleOptions.syncProject.cron, (fireDate) => syncProjectJob());
+  //   scheduleOptions.syncCut.enabled && ns.scheduleJob(scheduleOptions.syncCut.cron, (fireDate) => syncCutJob());
+  //   console.log('xj schedule start.');
+  // }
 })();

@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@elastic/elasticsearch": "^6.7.1",
     "async": "^2.0.1",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",

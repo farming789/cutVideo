@@ -3,6 +3,7 @@ var dbFeimu=require('../lib/dbFeimu');
 var idProvider=require('../lib/IdProvider');
 var async = require('async');
 var moment = require('moment');
+var es=require('../lib/es');
 
 module.exports.syncProject = (mvOriginItem,callback)=>{
     console.log("即将同步的片源数据："+JSON.stringify(mvOriginItem));
@@ -198,6 +199,8 @@ var updateProjectEpisode=(mvOrigin,episode,callback)=>{
                 //仅仅更新pe_audio_status
                 dbFeimu.query('update fm_project_episode set pe_audio_status=1,pe_acr_id=? where pe_id=?',[episode.pe_acr_id,episode.pe_id],next);
             }
+        },(next)=>{
+            syncEs(episode.p_id,next);
         }
     ],function (error,result) {
         if(error){
@@ -207,6 +210,74 @@ var updateProjectEpisode=(mvOrigin,episode,callback)=>{
         }
     })
 }
+
+/*
+同步es的可识别标识
+ */
+var syncEs=(pId,callback)=>{
+    console.log("pId:"+pId);
+    async.waterfall([
+        (next)=>{
+            dbFeimu.query('select mr_id from fm_project where p_id=? and p_delete_flag=1',[pId],(error,rows,fields)=>{
+                if(error){
+                    next(error,null);
+                }
+                if(!rows||rows.length==0){
+                    next(new Error("根据pId:"+pId+"没有找到片源"),null);
+                }
+                else if(!rows[0].mr_id||rows[0].mr_id==0){
+                    next(new Error("根据pId:"+pId+"没有找到影视剧"),null);
+                }else {
+                    next(null,rows[0].mr_id);
+                }
+            })
+        },(mrId,next)=>{
+            //查找该片源下的所有剧集是否存在识别的
+            dbFeimu.query('SELECT IF(count(*)>0,1,2) distinguish FROM fm_project_episode WHERE p_id=? AND pe_status=1 AND pe_delete_flag=1',[pId],(error,rows,fields)=>{
+                if(error){
+                    next(error,null);
+                }else {
+                    //可识别标识，1标识可以识别，2标识不可识别，默认不可识别
+                    var distinguish=2;
+                    if(rows&&rows.length>0){
+                        distinguish=rows[0]['distinguish'];
+                    }
+                    var body={
+                        script:'ctx._source.distinguish='+distinguish,
+                        upsert:{
+                            distinguish:2
+                        }
+                    };
+                    //es文档部分更新 https://www.elastic.co/guide/cn/elasticsearch/guide/current/partial-updates.html
+                    es.update(mrId,'movie_resources',body,next)
+                }
+            })
+        }
+    ],(error,result)=>{
+        if(error){
+            console.log("更新es错误:"+error.message);
+        }
+        //错误无需处理
+        callback(null);
+    })
+}
+
+
+
+module.exports.syncOldData=()=>{
+    db.query('select p_id from mv_origin where p_id is not null',null,function (error,rows,fields) {
+        var ids=rows.map(item=>item.p_id);
+        async.mapLimit(ids,1,syncEs,function (err,results) {
+        })
+    })
+}
+module.exports.testUpdateEs=()=>{
+    syncEs(10009,function (error,result) {
+        console.log(error);
+        console.log(JSON.stringify(result));
+    });
+}
+
 
 module.exports.syncCut = (originItem,callback)=>{
     var pId = originItem.p_id;
@@ -281,8 +352,6 @@ module.exports.syncCut = (originItem,callback)=>{
         }
     })
 }
-
-
 
 
 var doSyncCut=function (datas,peId,callback) {
