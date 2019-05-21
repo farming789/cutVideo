@@ -255,7 +255,7 @@ var syncEs=(pId,callback)=>{
         }
     ],(error,result)=>{
         if(error){
-            console.log("更新es错误:"+error.message);
+            console.error("更新es错误:"+error.message);
         }
         //错误无需处理
         callback(null);
