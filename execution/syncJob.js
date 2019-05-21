@@ -262,21 +262,19 @@ var syncEs=(pId,callback)=>{
     })
 }
 
-
-
-module.exports.syncOldData=()=>{
-    db.query('select p_id from mv_origin where p_id is not null',null,function (error,rows,fields) {
-        var ids=rows.map(item=>item.p_id);
-        async.mapLimit(ids,1,syncEs,function (err,results) {
-        })
-    })
-}
-module.exports.testUpdateEs=()=>{
-    syncEs(10009,function (error,result) {
-        console.log(error);
-        console.log(JSON.stringify(result));
-    });
-}
+// module.exports.syncOldData=()=>{
+//     db.query('select p_id from mv_origin where p_id is not null',null,function (error,rows,fields) {
+//         var ids=rows.map(item=>item.p_id);
+//         async.mapLimit(ids,1,syncEs,function (err,results) {
+//         })
+//     })
+// }
+// module.exports.testUpdateEs=()=>{
+//     async.mapLimit([],1,syncEs,function (err,results) {
+//         console.log(err);
+//         console.log(JSON.stringify(result));
+//     })
+// }
 
 
 module.exports.syncCut = (originItem,callback)=>{
