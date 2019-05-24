@@ -201,7 +201,6 @@ var updateProjectEpisode=(mvOrigin,episode,callback)=>{
                 dbFeimu.query('update fm_project_episode set pe_audio_status=1,pe_acr_id=? where pe_id=?',[episode.pe_acr_id,episode.pe_id],next);
             }
         },(rows,fields,next)=>{
-            console.log("aaaaaaaaaa",next);
             syncEs(episode.p_id,next);
         }
     ],function (error,result) {
@@ -330,7 +329,7 @@ module.exports.syncCut = (originItem,callback)=>{
                 throw new Error('转化失败');
             }
             //同步到feimu库
-            doSyncCut(datas,peId,next)
+            doSyncCut(datas,pId,peId,next)
         }else {
             next(null,rows);
         }
@@ -354,7 +353,7 @@ module.exports.syncCut = (originItem,callback)=>{
 }
 
 
-var doSyncCut=function (datas,peId,callback) {
+var doSyncCut=function (datas,pId,peId,callback) {
     var poolfeimu=dbFeimu.pool();
 
     poolfeimu.getConnection(function (err,con) {
@@ -385,6 +384,8 @@ var doSyncCut=function (datas,peId,callback) {
                         //仅仅更新pe_cut_status
                         con.query('update fm_project_episode set pe_cut_status=1 where pe_id=?',[peId],next);
                     }
+                },(rows,fields,next)=>{
+                    syncEs(pId,next);
                 }
             ],function(error,result){
                 if (error) {
