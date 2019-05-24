@@ -199,7 +199,7 @@ var updateProjectEpisode=(mvOrigin,episode,callback)=>{
                 //仅仅更新pe_audio_status
                 dbFeimu.query('update fm_project_episode set pe_audio_status=1,pe_acr_id=? where pe_id=?',[episode.pe_acr_id,episode.pe_id],next);
             }
-        },(next)=>{
+        },(rows,fields,next)=>{
             syncEs(episode.p_id,next);
         }
     ],function (error,result) {
