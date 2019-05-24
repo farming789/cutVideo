@@ -239,6 +239,11 @@ var syncCutJob=(callback)=>{
 
 }
 
+var batchSyncEs=()=>{
+    var ids=[6537622302958431232];
+    syncJob.batchSync(ids);
+}
+
 process.env.TZ = "Asia/Shanghai";
 Date.prototype.TimeZone = new Map([
     ['Europe/London',0],

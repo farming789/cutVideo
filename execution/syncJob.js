@@ -212,6 +212,12 @@ var updateProjectEpisode=(mvOrigin,episode,callback)=>{
     })
 }
 
+module.exports.batchSync=(pIds)=>{
+    async.mapLimit(pIds,1,syncEs,function () {
+
+    })
+}
+
 /*
 同步es的可识别标识
  */
@@ -243,6 +249,7 @@ var syncEs=(pId,callback)=>{
                     if(rows&&rows.length>0){
                         distinguish=rows[0]['distinguish'];
                     }
+                    console.log("pID:"+pId+"可识别状态："+distinguish);
                     var body={
                         script:'ctx._source.distinguish='+distinguish,
                         upsert:{
