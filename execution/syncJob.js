@@ -222,7 +222,7 @@ module.exports.batchSync=(pIds)=>{
 同步es的可识别标识
  */
 var syncEs=(pId,callback)=>{
-    console.log("pId:"+pId);
+    console.log("将要同步ES的pId:"+pId);
     async.waterfall([
         (next)=>{
             dbFeimu.query('select mr_id from fm_project where p_id=? and p_delete_flag=1',[pId],(error,rows,fields)=>{
