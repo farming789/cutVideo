@@ -365,6 +365,7 @@ var doSyncCut=function (datas,peId,callback) {
         con.beginTransaction(function (err) {
             if (err) {
                 console.log("开启事物失败");
+                con.release();
                 throw err;
             }
             async.waterfall([
@@ -389,15 +390,18 @@ var doSyncCut=function (datas,peId,callback) {
                 if (error) {
                     console.log(error);
                     con.rollback(function () {
+                        con.release();
                         callback(error);
                     })
                 } else {
                     con.commit(function (error1) {
                         if (error1) {
                             return con.rollback(function() {
+                                con.release();
                                 callback(error1);
                             });
                         }
+                        con.release();
                         console.log('result:' + JSON.stringify(result));
                         callback(null,result);
                     })
