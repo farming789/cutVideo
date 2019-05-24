@@ -11,6 +11,7 @@ module.exports.syncProject = (mvOriginItem,callback)=>{
         //同步feimu数据库的project表  片名，作品形式 ，总集数，豆瓣链接
         dbFeimu.query('select * from fm_project where p_name=? and p_delete_flag=1',[mvOriginItem.video_name],next)
     },(rows,fields,next)=>{
+        console.log("获取的project数据是："+JSON.stringify(rows));
         if(rows&&rows.length>0){
             next(null,rows[0].p_id)
         }else {
@@ -181,7 +182,7 @@ var updateProjectEpisode=(mvOrigin,episode,callback)=>{
         (next)=>{
             db.query('select * from mv_novideos where file_title=?',[mvOrigin.file_title],function (error,rows,fields) {
                 if(error){
-                    next(error,null);
+                    next(error);
                 }else {
                     if(rows&&rows.length>0){
                         episode.pe_acr_id = rows[0].acr_id;
@@ -200,6 +201,7 @@ var updateProjectEpisode=(mvOrigin,episode,callback)=>{
                 dbFeimu.query('update fm_project_episode set pe_audio_status=1,pe_acr_id=? where pe_id=?',[episode.pe_acr_id,episode.pe_id],next);
             }
         },(rows,fields,next)=>{
+            console.log("aaaaaaaaaa",next);
             syncEs(episode.p_id,next);
         }
     ],function (error,result) {
