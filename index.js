@@ -240,8 +240,7 @@ var syncCutJob=(callback)=>{
 }
 
 var batchSyncEs=()=>{
-    var ids=[6537622302958431232];
-    syncJob.batchSync(ids);
+    syncJob.batchSyncEs();
 }
 
 process.env.TZ = "Asia/Shanghai";

@@ -214,9 +214,13 @@ var updateProjectEpisode=(mvOrigin,episode,callback)=>{
     })
 }
 
-module.exports.batchSync=(pIds)=>{
-    async.mapLimit(pIds,1,syncEs,function () {
+module.exports.batchSyncEs=()=>{
+    var pIds=[];
+    db.query("select * from mv_origin  where sync_at>'2019-05-10' and p_id=6537618550759238657",null,(error,rows,fields)=>{
+        pIds=rows.map(p=>p.p_id);
+        async.mapLimit(pIds,1,syncEs,function () {
 
+        })
     })
 }
 
