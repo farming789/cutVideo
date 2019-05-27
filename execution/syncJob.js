@@ -142,7 +142,9 @@ var insertProjectEpisode=(mvOrigin,pId,callback)=>{
                     episode.pe_id=id;
                     episode.p_id=pId;
                     mvOrigin.pe_id=id;
-                    episode.pe_episode_name="第"+mvOrigin.sets+"集"
+                    if(1 < mvOrigin.total_sets){
+                        episode.pe_episode_name="第"+mvOrigin.sets+"集"
+                    }
                     episode.pe_file_name=mvOrigin.file_title;
                     episode.pe_sets=mvOrigin.sets;
                     episode.pe_audio_status=1;
