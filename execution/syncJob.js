@@ -7,6 +7,11 @@ var es=require('../lib/es');
 
 module.exports.syncProject = (mvOriginItem,callback)=>{
     console.log("即将同步的片源数据："+JSON.stringify(mvOriginItem));
+    //如果没有videoname则不同步
+    if(!mvOriginItem.video_name || mvOriginItem.video_name==''){
+        callback();
+        return;
+    }
     async.waterfall([(next)=>{
         //同步feimu数据库的project表  片名，作品形式 ，总集数，豆瓣链接
         dbFeimu.query('select * from fm_project where p_name=? and p_delete_flag=1',[mvOriginItem.video_name],next)
