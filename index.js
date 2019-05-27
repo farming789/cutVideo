@@ -239,6 +239,7 @@ var syncCutJob=(callback)=>{
 
 }
 
+//手动同步es的可识别状态
 var batchSyncEs=()=>{
     syncJob.batchSyncEs();
 }
