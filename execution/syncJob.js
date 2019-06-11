@@ -402,8 +402,6 @@ var doSyncCut=function (datas,pId,peId,callback) {
                         //仅仅更新pe_cut_status
                         con.query('update fm_project_episode set pe_cut_status=1 where pe_id=?',[peId],next);
                     }
-                },(rows,fields,next)=>{
-                    syncEs(pId,next);
                 }
             ],function(error,result){
                 if (error) {
@@ -421,6 +419,8 @@ var doSyncCut=function (datas,pId,peId,callback) {
                             });
                         }
                         con.release();
+                        //事物提交后，同步es的可识别状态
+                        syncEs(pId,function () {});
                         console.log('result:' + JSON.stringify(result));
                         callback(null,result);
                     })
