@@ -229,7 +229,7 @@ var syncCutJob=(callback)=>{
         if (err) {
             console.log(err);
         } else {
-            console.log('sync project job done');
+            console.log('sync cut job done');
         }
         jobLocked.syncCutJob = false;
         if (callback) {
