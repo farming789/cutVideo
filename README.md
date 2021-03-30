@@ -1,5 +1,6 @@
 # xj-node
-# nodejs+ffmpeg 开发的切割视频，提取音频，上传到七牛云和acrCloud
+# 并行切割视频，提取音频，上传到七牛云和acrCloud
+# 技术：nodejs+ffmpeg
 
 安装nvm
 ```bash
