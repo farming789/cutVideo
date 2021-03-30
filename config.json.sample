@@ -1,31 +1,31 @@
 {
  "db": {
       "connectionLimit": 20,
-      "host": "feimumaster.mysql.rds.aliyuncs.com",
+      "host": "mysql.rds.aliyuncs.com",
       "user": "root",
-      "password": "feimu!@#0",
+      "password": "fe",
       "database": "feimu-cut-test",
       "timezone": "08:00",
        "supportBigNumbers":true
     },
   "ssh":{
-      "host":"47.100.255.139",
+      "host":"",
       "user":"feimu139",
-      "privateKeyPath":"/Users/yuhuaming/.ssh/id_rsa"
+      "privateKeyPath":"/Us/.ssh/id_rsa"
   },
   "dbFeimu": {
      "connectionLimit": 20,
-          "host": "feimumaster.mysql.rds.aliyuncs.com",
+          "host": "rds.aliyuncs.com",
           "user": "root",
-          "password": "feimu!@#0",
-          "database": "feimu-test",
+          "password": "feimu",
+          "database": "feim",
           "timezone": "08:00",
            "supportBigNumbers":true
   },
   "sshFeimu":{
-      "host":"47.100.255.139",
-      "user":"feimu139",
-      "privateKeyPath":"/Users/yuhuaming/.ssh/id_rsa"
+      "host":"",
+      "user":"fe",
+      "privateKeyPath":"/Us/.ssh/id_rsa"
   },
   "acrcloud": {
     "dataType":"fingerprint",
@@ -33,8 +33,8 @@
       "host": "cn-api.acrcloud.com",
       "signature_version": "1",
       "secure": true,
-      "access_key": "15b2bcdf119b12e1",
-      "access_secret": "992b6a1b26e569f367bd604095654812"
+      "access_key": "",
+      "access_secret": ""
     },
     "fingerprint" : {
       "cmd":"/home/ubuntu/bin/acrcloud_extr_linux"
@@ -44,11 +44,11 @@
    "ffmpegPath" : "/home/ubuntu/bin/ffmpeg",
    "ffprobePath": "/home/ubuntu/bin/ffprobe",
     "basePath": {
-      "origin": "/Users/njwangchuan/media/origin/",
-      "novideo": "/Users/njwangchuan/media/novideo/",
-      "resize": "/Users/njwangchuan/media/resize/",
-      "cut": "/Users/njwangchuan/media/cut/",
-      "fingerprint": "/Users/njwangchuan/daily/media-fingerprint/"
+      "origin": "/Users/media/origin/",
+      "novideo": "/Users/media/novideo/",
+      "resize": "/Users/media/resize/",
+      "cut": "/Users/media/cut/",
+      "fingerprint": "/Users/daily/media-fingerprint/"
     },
     "resize": {
          "forceResize":false,
@@ -109,8 +109,8 @@
        }
   },
   "qiniu": {
-    "ak": "oSIae2sZ5gLi2MVW6VOsLPr3GoW8RFZiopYNXYon",
-    "sk": "a5mqSXohWcu49gaflxq7w6gqP40jIdhYQ-Yd27qG",
+    "ak": "",
+    "sk": "-Yd27qG",
     "zone" : "Zone_z0",
     "bucket": "tvsonar-cut",
     "file_name_hash":true,
@@ -122,10 +122,10 @@
         "gif" : "feimu-cut"
         }
       },
-    "ak": "oSIae2sZ5gLi2MVW6VOsLPr3GoW8RFZiopYNXYon",
-    "sk": "a5mqSXohWcu49gaflxq7w6gqP40jIdhYQ-Yd27qG",
+    "ak": "",
+    "sk": "-Yd27qG",
     "zone": "Zone_z0",
-    "bucket": "tvsonar-cut",
+    "bucket": "",
     "file_name_hash": true
   },
  "schedule": {
