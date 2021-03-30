@@ -1,5 +1,5 @@
 # xj-node
-
+# nodejs 开发的切割视频，提取音频，上传到七牛云
 
 安装nvm
 ```bash
