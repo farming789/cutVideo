@@ -106,3 +106,7 @@ $ pm2 logs {index}
 
 - 同步已经上传音频文件的处理状态（处理中-就绪）
 - 远程删除mv_novideos表中del_status状态为1的音频
+
+## 谢谢赞助
+![image](https://user-images.githubusercontent.com/18420324/112929628-6485d800-914b-11eb-9938-44d022c816da.png)
+
