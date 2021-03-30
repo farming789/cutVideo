@@ -1,5 +1,5 @@
 # xj-node
-# 并行切割视频，提取音频，上传到七牛云和acrCloud
+# 分布式并行切割视频，提取音频，上传到七牛云和acrCloud
 # 技术：nodejs+ffmpeg
 
 安装nvm
